@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wrpxcx.mapper.OrderMapper">
+
+
+    <insert id="addOrder" parameterType="com.wrpxcx.POJO.Order" useGeneratedKeys="true" keyProperty="orderId">
+        insert into tb_order(buy_openid, sail_openid, goods_id, order_status, order_time)
+            value(#{buyOpenid}, #{sailOpenid}, #{goodsId}, #{orderStatus}, #{orderTime})
+    </insert>
+
+    <delete id="deleteOrder" >
+        delete from tb_order where order_id=#{orderId}
+    </delete>
+
+    <select id="getOrderByBuyOpenid" resultType="com.wrpxcx.POJO.OrderDetail">
+        select order_id, buy_openid, sail_openid, tb_order.goods_id, order_status, order_time,
+                sail_user.user_name sail_user_name, sail_user.head_address sail_head_address,
+                goods_name, price, description, tb_goods.school_id, kind_id, goods_image, add_time,
+                buy_user.user_name buy_user_name, buy_user.head_address buy_head_address
+                from tb_order
+                inner join tb_user sail_user on tb_order.sail_openid=sail_user.openid
+                inner join tb_user buy_user on tb_order.buy_openid=buy_user.openid
+                inner join tb_goods on tb_order.goods_id=tb_goods.goods_id
+                where tb_order.buy_openid=#{buyOpenid} and (order_status=#{orderStatus1} or order_status=#{orderStatus2})
+                order by order_time
+
+    </select>
+
+    <select id="getOrderBySailOpenid" resultType="com.wrpxcx.POJO.OrderDetail">
+         select order_id, buy_openid, sail_openid, tb_order.goods_id, order_status, order_time,
+                sail_user.user_name sail_user_name, sail_user.head_address sail_head_address,
+                goods_name, price, description, tb_goods.school_id, kind_id, goods_image, add_time,
+                buy_user.user_name buy_user_name, buy_user.head_address buy_head_address
+                from tb_order
+                inner join tb_user sail_user on tb_order.sail_openid=sail_user.openid
+                inner join tb_user buy_user on tb_order.buy_openid=buy_user.openid
+                inner join tb_goods on tb_order.goods_id=tb_goods.goods_id
+                where tb_order.sail_openid=#{sailOpenid} and (order_status=#{orderStatus1} or order_status=#{orderStatus2})
+    </select>
+
+    <select id="getOrderByOrderId" resultType="com.wrpxcx.POJO.OrderDetail">
+        select order_id, buy_openid, sail_openid, tb_order.goods_id, order_status, order_time,
+                user_name, head_address, goods_name, price, description, tb_goods.school_id, kind_id, goods_image, add_time
+                from tb_order
+                inner join tb_user on tb_order.sail_openid=tb_user.openid
+                inner join tb_goods on tb_order.goods_id=tb_goods.goods_id
+                where tb_order.order_id=#{orderId}
+    </select>
+
+    <update id="updateOrderStatusByOrderId">
+        update tb_order set order_status=#{status} where order_id=#{orderId}
+    </update>
+
+</mapper>

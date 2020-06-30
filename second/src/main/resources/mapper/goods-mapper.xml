@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wrpxcx.mapper.GoodsMapper">
+
+    <resultMap id="resultGoodsMap" type="com.wrpxcx.POJO.Goods">
+        <!-- 其他属性自行补充 ... -->
+        <result property="goodsName" column="goods_name" />
+    </resultMap>
+
+    <select id="getGoodsByOpenid" resultType="com.wrpxcx.POJO.Goods">
+        select * from tb_goods where openid=#{openid} order by add_time DESC
+    </select>
+
+    <select id="getGoodsByGoodsId" resultType="com.wrpxcx.POJO.Goods">
+        select * from tb_goods where goods_id=#{goodsId}
+    </select>
+
+    <select id="getGoodsBySchoolAndKind" resultType="com.wrpxcx.POJO.Goods">
+        select * from tb_goods where school_id=#{schoolId} and kind_id=#{kindId}
+    </select>
+
+
+    <select id="getGoods" resultType="com.wrpxcx.POJO.Goods">
+        select * from tb_goods where goods_status=1 and school_id=#{schoolId} and kind_id=#{kindId}
+    </select>
+
+    <select id="getGoodsBySchoolAndKindPage" resultType="com.wrpxcx.POJO.Goods">
+        select * from tb_goods where goods_status=1 and school_id=#{schoolId} and kind_id=#{kindId} order by add_time DESC limit #{nowNumber}, #{number}
+    </select>
+
+    <select id="getMyPublicGoodsPage" resultType="com.wrpxcx.POJO.Goods">
+        select * from tb_goods where openid=#{openid} and goods_status=1 order by add_time DESC limit #{nowNumber}, #{number}
+    </select>
+
+    <insert id="addGoods" parameterType="com.wrpxcx.POJO.Goods" useGeneratedKeys="true" keyProperty="goodsId">
+        insert into tb_goods(openid, goods_name, price, description, school_id, kind_id, goods_image, add_time, goods_status)
+        value (#{openid}, #{goodsName}, #{price}, #{description}, #{schoolId}, #{kindId}, #{goodsImage}, #{addTime}, #{goodsStatus})
+    </insert>
+
+    <update id="updateGoods" parameterType="com.wrpxcx.POJO.Goods">
+        update tb_goods
+        <trim prefix="set" suffixOverrides=",">
+            <if test="goodsName!=null">goods_name=#{goodsName},</if>
+            <if test="price!=null">price=#{price},</if>
+            <if test="description!=null">description=#{description},</if>
+            <if test="schoolId!=null">school_id=#{schoolId},</if>
+            <if test="kindId!=null">kind_id=#{kindId},</if>
+            <if test="goodsImage!=null">goods_image=#{goodsImage},</if>
+            <if test="addTime!=null">add_time=#{addTime},</if>
+            <if test="goodsStatus!=null">goods_status=#{goodsStatus},</if>
+        </trim>
+        WHERE goods_id=#{goodsId}
+    </update>
+
+    <delete id="deleteGoodsByGoodsId" parameterType="int">
+        delete from tb_goods where goods_id=#{goodsId}
+    </delete>
+
+    <select id="getNav" resultType="com.wrpxcx.POJO.GoodsKind">
+        select * from goods_kind
+    </select>
+
+    <select id="searchGoodsBySchoolIdAndName" resultType="com.wrpxcx.POJO.Goods">
+        select * from tb_goods
+
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            goods_status=1 and school_id=#{schoolId} and
+            <if test="name != null">
+                goods_name like "%"#{name}"%"
+            </if>
+        </trim>
+        order by price, add_time DESC limit #{nowNumber}, #{number}
+    </select>
+</mapper>

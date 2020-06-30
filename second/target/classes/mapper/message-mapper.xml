@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wrpxcx.mapper.MessageMapper">
+    <insert id="addMessage" parameterType="com.wrpxcx.POJO.Message">
+        insert into tb_message(from_openid, to_openid, context, message_time, status)
+                        value(#{fromOpenid}, #{toOpenid}, #{context}, #{messageTime}, #{status})
+    </insert>
+
+    <select id="getMessagesByOpenid" resultType="com.wrpxcx.POJO.Message">
+        select from_openid, to_openid, context, message_time, status
+                from tb_message
+                where
+                (from_openid=#{fromOpenid} and to_openid=#{toOpenid}) or (from_openid=#{toOpenid} and to_openid=#{fromOpenid})
+                order by message_time ASC
+    </select>
+
+    <insert id="addLastMessage" parameterType="com.wrpxcx.POJO.LastMessage">
+       insert into tb_last_message(from_openid, to_openid, last_message, last_time, not_read_num)
+        value(#{fromOpenid}, #{toOpenid}, #{lastMessage}, #{lastTime}, #{notReadNum})
+    </insert>
+
+    <update id="updateLastMessage" parameterType="com.wrpxcx.POJO.LastMessage">
+        update tb_last_message
+        <trim prefix="set" suffixOverrides=",">
+            <if test="fromOpenid!=null">from_openid=#{fromOpenid},</if>
+            <if test="toOpenid!=null">to_openid=#{toOpenid},</if>
+            <if test="lastMessage!=null">last_message=#{lastMessage},</if>
+            <if test="lastTime!=null">last_time=#{lastTime},</if>
+            <if test="notReadNum!=null">not_read_num=#{notReadNum},</if>
+        </trim>
+        WHERE (from_openid=#{fromOpenid} and to_openid=#{toOpenid}) or (to_openid=#{fromOpenid} and from_openid=#{toOpenid})
+    </update>
+
+   <select id="getMessageListByOpenid" resultType="com.wrpxcx.POJO.LastMessageDetail">
+       select from_openid, to_openid, last_message, last_time, not_read_num,
+                from_user.user_name from_name, from_user.head_address from_head_address,
+                to_user.user_name to_name, to_user.head_address to_head_address
+                from tb_last_message
+                inner join tb_user from_user on from_user.openid=from_openid
+                inner join tb_user to_user on to_user.openid=to_openid
+                where from_openid=#{openid} or to_openid=#{openid}
+                order by last_time ASC
+   </select>
+
+    <select id="getMessageListByFromAndTo" resultType="com.wrpxcx.POJO.LastMessageDetail">
+       select from_openid, to_openid, last_message, last_time, not_read_num,
+                from_user.user_name from_name, from_user.head_address from_head_address,
+                to_user.user_name to_name, to_user.head_address to_head_address
+                from tb_last_message
+                inner join tb_user from_user on from_user.openid=from_openid
+                inner join tb_user to_user on to_user.openid=to_openid
+                where
+                (from_openid=#{fromOpenid} and to_openid=#{toOpenid}) or (to_openid=#{fromOpenid} and from_openid=#{toOpenid})
+                order by last_time ASC
+
+    </select>
+
+    <update id="zeroNotReadNum" >
+        update tb_last_message
+        set
+         not_read_num=0
+        where
+            (from_openid=#{fromOpenid} and to_openid=#{toOpenid}) or (to_openid=#{fromOpenid} and from_openid=#{toOpenid})
+    </update>
+
+    <update id="addNotReadNum">
+        update tb_last_message
+        set
+         not_read_num = not_read_num + 1
+        where
+            (from_openid=#{fromOpenid} and to_openid=#{toOpenid}) or (to_openid=#{fromOpenid} and from_openid=#{toOpenid})
+    </update>
+
+
+</mapper>

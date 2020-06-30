@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wrpxcx.mapper.FeedbackMapper">
+    <insert id="addFeedback" parameterType="com.wrpxcx.POJO.FeedbackMessage">
+        insert into tb_feedback(openid, user_name, context)
+        value (#{openid}, #{userName}, #{context})
+    </insert>
+
+    <select id="getAllFeedback" resultType="com.wrpxcx.POJO.FeedbackMessage">
+        select * from tb_feedback
+    </select>
+</mapper>

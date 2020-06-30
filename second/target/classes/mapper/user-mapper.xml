@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wrpxcx.mapper.UserMapper">
+    <insert id="addUser" parameterType="com.wrpxcx.POJO.User">
+        insert into tb_user(openid, user_name, head_address, user_school)
+        value (#{openid}, #{userName}, #{headAddress}, #{userSchool})
+    </insert>
+
+    <update id="updateUser" parameterType="com.wrpxcx.POJO.User">
+        update tb_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="userName!=null">user_name=#{userName},</if>
+            <if test="headAddress!=null">head_address=#{headAddress},</if>
+            <if test="userSchool!=null">user_school=#{userSchool},</if>
+        </trim>
+        WHERE openid=#{openid}
+    </update>
+
+    <select id="getUserByOpenid"  resultType="com.wrpxcx.POJO.User" parameterType="String">
+        select * from tb_user where openid=#{openid}
+    </select>
+
+</mapper>
